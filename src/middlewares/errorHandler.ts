@@ -11,7 +11,19 @@
 //
 // ============================================================
 
-import { Request, Response, NextFunction } from "express";
 
 // Escreva seu código aqui:
 
+import { Request, Response, NextFunction } from "express";
+import { AppError, ValidationError } from "../errors";
+
+export function errorHandler(err: Error, req: Request, res: Response, next: NextFunction) {
+    if (err instanceof ValidationError) {
+        return res.status(400).json({ sucesso: false, erros: err.erros });
+    }
+    if (err instanceof AppError) {
+        return res.status(err.statusCode).json({ sucesso: false, mensagem: err.message });
+    }
+    console.error(err);
+    res.status(500).json({ sucesso: false, mensagem: "Erro interno do servidor" });
+}
